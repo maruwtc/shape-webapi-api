@@ -2,8 +2,8 @@ import Koa from 'koa'
 import Router, { RouterContext } from 'koa-router'
 import json from 'koa-json'
 import { connect as ConnectDB } from './config/database'
-import { router as users } from './routes/users.route'
-import { router as pets } from './routes/pets.route'
+import { router as users } from './routes/v1/users.route'
+import { router as pets } from './routes/v1/pets.route'
 
 const app: Koa = new Koa()
 
