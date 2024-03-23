@@ -1,8 +1,7 @@
 import crypto from 'crypto'
 import { User, UserInput } from '../models/users.model'
 
-const hashPassword = (password: string): string => {
-    const salt = crypto.randomBytes(16).toString('hex')
+const hashPassword = (password: string, salt: string): string => {
     return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
 }
 
@@ -34,11 +33,23 @@ const getUserById = async (ctx: any) => {
 const createUser = async (ctx: any) => {
     try {
         const { name, role, password }: UserInput = ctx.request.body
+        const salt = crypto.randomBytes(16).toString('hex')
+        const hashedPassword = hashPassword(password, salt)
+        const smallestUsableId = await User.find().sort({ id: 1 }).limit(1)
+        let newId = smallestUsableId[0].id + 1
+        while (true) {
+            const existingUser = await User.findOne({ id: newId })
+            if (!existingUser) {
+                break 
+            }
+            newId++
+        }
         const user = new User({
-            id: Math.floor(Math.random() * 100),
+            id: newId,
             name,
             role,
-            password: hashPassword(password)
+            password: hashedPassword,
+            salt: salt
         })
         await user.save()
         ctx.body = user
@@ -53,11 +64,15 @@ const updateUser = async (ctx: any) => {
         const { name, role, password }: UserInput = ctx.request.body
         const user = await User.findOne({ id: ctx.params.id })
         if (user) {
+            const salt = crypto.randomBytes(16).toString('hex')
+            const hashedPassword = hashPassword(password, salt)
             user.name = name
             user.role = role
-            user.password = hashPassword(password)
+            user.password = hashedPassword
+            user.salt = salt
             await user.save()
             ctx.body = user
+            ctx.body.__v ++
         } else {
             ctx.status = 404
             ctx.body = { message: 'User not found' }

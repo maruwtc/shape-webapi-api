@@ -1,6 +1,8 @@
 import Koa from 'koa'
 import Router, { RouterContext } from 'koa-router'
 import json from 'koa-json'
+import bodyParser from 'koa-bodyparser'
+import passport from 'koa-passport'
 import { connect as ConnectDB } from './config/database'
 import { router as users } from './routes/v1/users.route'
 import { router as pets } from './routes/v1/pets.route'
@@ -15,8 +17,10 @@ router.get('/', (ctx: RouterContext) => {
     ctx.body = 'Welcome to the API!'
 })
 
-app.use(json())
 app.use(router.routes())
+app.use(json())
+app.use(bodyParser())
+app.use(passport.initialize())
 app.use(users.routes())
 app.use(pets.routes())
 

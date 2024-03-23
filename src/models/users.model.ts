@@ -1,10 +1,11 @@
 import mongoose, { Model } from 'mongoose'
 
 type UserDocument = mongoose.Document & {
-    id: number
-    name: string
-    role: string
-    password: string
+    id: number;
+    name: string;
+    role: string;
+    password: string;
+    salt?: string
 }
 
 type UserInput = {
@@ -15,9 +16,10 @@ type UserInput = {
 
 const UserSchema = new mongoose.Schema({
     id: { type: Number, required: true },
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true},
     role: { type: String, required: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    salt: { type: String }
 })
 
 const User: Model<UserDocument> = mongoose.model<UserDocument>('users', UserSchema)
