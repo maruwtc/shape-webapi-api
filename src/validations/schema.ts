@@ -36,3 +36,26 @@ export const petsSchema = {
     },
     "required": ["name", "category", "age", "breed", "location", "image", "description"]
 }
+
+export const usersSchema = {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "/users",
+    "title": "User",
+    "description": "A user",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the user"
+        },
+        "role": {
+            "type": "string",
+            "description": "The role of the user"
+        },
+        "password": {
+            "type": "string",
+            "description": "The password of the user"
+        }
+    },
+    "required": ["name", "role", "password"]
+}
