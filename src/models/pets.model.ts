@@ -22,7 +22,7 @@ type PetInput = {
 }
 
 const PetSchema = new mongoose.Schema({
-    id: { type: Number, required: true },
+    id: { type: Number, required: true, unique: true},
     name: { type: String, required: true },
     category: { type: String, required: true },
     age: { type: Number, required: true },
@@ -30,7 +30,7 @@ const PetSchema = new mongoose.Schema({
     location: { type: String, required: true },
     image: { type: String, required: true },
     description: { type: String, required: true }
-})
+}, { versionKey: false })
 
 const Pet: Model<PetDocument> = mongoose.model<PetDocument>('pets', PetSchema)
 
