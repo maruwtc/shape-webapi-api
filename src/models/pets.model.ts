@@ -30,7 +30,7 @@ const PetSchema = new mongoose.Schema({
     location: { type: String, required: true },
     image: { type: String, required: true },
     description: { type: String, required: true }
-}, { versionKey: false })
+})
 
 const Pet: Model<PetDocument> = mongoose.model<PetDocument>('pets', PetSchema)
 

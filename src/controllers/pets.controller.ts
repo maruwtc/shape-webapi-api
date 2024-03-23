@@ -61,6 +61,7 @@ const updatePet = async (ctx: any) => {
             pet.description = description
             await pet.save()
             ctx.body = pet
+            ctx.body.__v ++
         } else {
             ctx.status = 404
             ctx.body = { message: 'Pet not found' }
