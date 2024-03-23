@@ -14,9 +14,15 @@ dependencies:
   '@types/koa-json':
     specifier: ^2.0.23
     version: 2.0.23
+  '@types/koa-passport':
+    specifier: ^6.0.3
+    version: 6.0.3
   '@types/koa-router':
     specifier: ^7.4.8
     version: 7.4.8
+  '@types/passport-http':
+    specifier: ^0.3.11
+    version: 0.3.11
   dotenv:
     specifier: ^16.4.5
     version: 16.4.5
@@ -32,12 +38,18 @@ dependencies:
   koa-json:
     specifier: ^2.0.2
     version: 2.0.2
+  koa-passport:
+    specifier: ^6.0.0
+    version: 6.0.0
   koa-router:
     specifier: ^12.0.1
     version: 12.0.1
   mongoose:
     specifier: ^8.2.3
     version: 8.2.3
+  passport-http:
+    specifier: ^0.3.0
+    version: 0.3.0
 
 packages:
 
@@ -127,6 +139,13 @@ packages:
       '@types/koa': 2.15.0
     dev: false
 
+  /@types/koa-passport@6.0.3:
+    resolution: {integrity: sha512-9iV8aiSICfBZpqkkzUshqxN2wTuoj4HGRRH0Idv3lHhXV9rZRCOyDdJSg+vZ6RHSQg0ZeBeAdIL4r/l8bR4SPA==}
+    dependencies:
+      '@types/koa': 2.15.0
+      '@types/passport': 1.0.16
+    dev: false
+
   /@types/koa-router@7.4.8:
     resolution: {integrity: sha512-SkWlv4F9f+l3WqYNQHnWjYnyTxYthqt8W9az2RTdQW7Ay8bc00iRZcrb8MC75iEfPqnGcg2csEl8tTG1NQPD4A==}
     dependencies:
@@ -158,6 +177,19 @@ packages:
     resolution: {integrity: sha512-dHM6ZxwlmuZaRmUPfv1p+KrdD1Dci04FbdEm/9wEMouFqxYoFl5aMkt0VMAUtYRQDyYvD41WJLukhq/ha3YuTw==}
     dependencies:
       undici-types: 5.26.5
+    dev: false
+
+  /@types/passport-http@0.3.11:
+    resolution: {integrity: sha512-FO0rDRYtuha9m2ZgRx5+jrgrrkAnUzgzdItFI0dwKBC6k9pArK677Gtan67u6+Qah2nXVP3M1uZ5p90SpBT5Zg==}
+    dependencies:
+      '@types/express': 4.17.21
+      '@types/passport': 1.0.16
+    dev: false
+
+  /@types/passport@1.0.16:
+    resolution: {integrity: sha512-FD0qD5hbPWQzaM0wHUnJ/T0BBCJBxCeemtnCwc/ThhTg3x9jfrAcRUmj5Dopza+MfFS9acTe3wk7rcVnRIp/0A==}
+    dependencies:
+      '@types/express': 4.17.21
     dev: false
 
   /@types/qs@6.9.14:
@@ -511,6 +543,13 @@ packages:
       streaming-json-stringify: 3.1.0
     dev: false
 
+  /koa-passport@6.0.0:
+    resolution: {integrity: sha512-bgcrQN7Ylfgi1PVr5l6hHYkr38RHUzx+ty3m7e/xoTte8MR0zbDt6+pvP3/nuF/yXL6Ba7IzX1rSqmCy6OrrIw==}
+    engines: {node: '>= 4'}
+    dependencies:
+      passport: 0.6.0
+    dev: false
+
   /koa-router@12.0.1:
     resolution: {integrity: sha512-gaDdj3GtzoLoeosacd50kBBTnnh3B9AYxDThQUo4sfUyXdOhY6ku1qyZKW88tQCRgc3Sw6ChXYXWZwwgjOxE0w==}
     engines: {node: '>= 12'}
@@ -689,8 +728,33 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
+  /passport-http@0.3.0:
+    resolution: {integrity: sha512-OwK9DkqGVlJfO8oD0Bz1VDIo+ijD3c1ZbGGozIZw+joIP0U60pXY7goB+8wiDWtNqHpkTaQiJ9Ux1jE3Ykmpuw==}
+    engines: {node: '>= 0.4.0'}
+    dependencies:
+      passport-strategy: 1.0.0
+    dev: false
+
+  /passport-strategy@1.0.0:
+    resolution: {integrity: sha512-CB97UUvDKJde2V0KDWWB3lyf6PC3FaZP7YxZ2G8OAtn9p4HI9j9JLP9qjOGZFvyl8uwNT8qM+hGnz/n16NI7oA==}
+    engines: {node: '>= 0.4.0'}
+    dev: false
+
+  /passport@0.6.0:
+    resolution: {integrity: sha512-0fe+p3ZnrWRW74fe8+SvCyf4a3Pb2/h7gFkQ8yTJpAO50gDzlfjZUZTO1k5Eg9kUct22OxHLqDZoKUWRHOh9ug==}
+    engines: {node: '>= 0.4.0'}
+    dependencies:
+      passport-strategy: 1.0.0
+      pause: 0.0.1
+      utils-merge: 1.0.1
+    dev: false
+
   /path-to-regexp@6.2.1:
     resolution: {integrity: sha512-JLyh7xT1kizaEvcaXOQwOc2/Yhw6KZOvPf1S8401UyLk86CU79LN3vl7ztXGm/pZ+YjoyAJ4rxmHwbkBXJX+yw==}
+    dev: false
+
+  /pause@0.0.1:
+    resolution: {integrity: sha512-KG8UEiEVkR3wGEb4m5yZkVCzigAD+cVEJck2CzYZO37ZGJfctvVptVO192MwrtPhzONn6go8ylnOdMhKqi4nfg==}
     dev: false
 
   /process-nextick-args@2.0.1:
@@ -838,6 +902,11 @@ packages:
 
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+    dev: false
+
+  /utils-merge@1.0.1:
+    resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
+    engines: {node: '>= 0.4.0'}
     dev: false
 
   /vary@1.1.2:
