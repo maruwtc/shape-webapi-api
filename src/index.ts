@@ -3,11 +3,14 @@ import Router, { RouterContext } from 'koa-router'
 import json from 'koa-json'
 import bodyParser from 'koa-bodyparser'
 import passport from 'koa-passport'
+import * as dotenv from 'dotenv'
 import { connect as ConnectDB } from './config/database'
 import { router as users } from './routes/v1/users.route'
 import { router as pets } from './routes/v1/pets.route'
 
 const app: Koa = new Koa()
+
+dotenv.config()
 
 ConnectDB().catch(console.dir)
 
@@ -36,6 +39,6 @@ app.use(async (ctx: RouterContext, next: any) => {
     }
 })
 
-app.listen(8000, () => {
-    console.log('Server is running at http://localhost:8000')
+app.listen(process.env.SERVER_PORT, () => {
+    console.log(`Server is running at port ${process.env.SERVER_PORT}`)
 })

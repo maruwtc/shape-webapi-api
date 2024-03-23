@@ -1,10 +1,11 @@
 import * as mongoose from 'mongoose'
-import { config } from 'dotenv'
+import dotenv from 'dotenv'
 
-const { parsed } = config()
-const user = parsed?.MONGODB_USER
-const password = parsed?.MONGODB_PASSWORD
-const dbName = parsed?.MONGODB_DB
+dotenv.config()
+
+const user = process.env.MONGODB_USER
+const password = process.env.MONGODB_PASSWORD
+const dbName = process.env.MONGODB_DB
 
 const uri = `mongodb+srv://${user}:${password}@${dbName}.4eilgsx.mongodb.net/${dbName}`
 
