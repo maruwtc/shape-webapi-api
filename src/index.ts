@@ -30,6 +30,8 @@ app.use(users.routes())
 app.use(pets.routes())
 
 app.use(async (ctx: RouterContext, next: any) => {
+    ctx.set('Access-Control-Allow-Origin', '*')
+    ctx.set('Content-Type', 'application/json')
     try {
         await next()
         if (ctx.status === 404) {
