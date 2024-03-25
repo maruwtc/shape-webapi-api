@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@koa/cors": "^5.0.0",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-json": "^2.0.23",
@@ -25,5 +26,8 @@
     "koa-router": "^12.0.1",
     "mongoose": "^8.2.3",
     "passport-http": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/koa__cors": "^5.0.0"
   }
 }
