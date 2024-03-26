@@ -9,29 +9,26 @@ import { connect as ConnectDB } from './config/database'
 import { router as users } from './routes/v1/users.route'
 import { router as pets } from './routes/v1/pets.route'
 
-const app: Koa = new Koa()
-app.use(cors())
-
-dotenv.config()
-
-ConnectDB().catch(console.dir)
-
 const router: Router = new Router()
 
 router.get('/', (ctx: RouterContext) => {
     ctx.body = 'Welcome to the API!'
 })
 
-app.use(router.routes())
+const app: Koa = new Koa()
+
+dotenv.config()
+ConnectDB().catch(console.dir)
+
+app.use(cors())
 app.use(json())
 app.use(bodyParser())
 app.use(passport.initialize())
+app.use(router.routes())
 app.use(users.routes())
 app.use(pets.routes())
 
 app.use(async (ctx: RouterContext, next: any) => {
-    ctx.set('Access-Control-Allow-Origin', '*')
-    ctx.set('Content-Type', 'application/json')
     try {
         await next()
         if (ctx.status === 404) {
