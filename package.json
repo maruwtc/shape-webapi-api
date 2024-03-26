@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpx ts-node src/index.ts"
+    "dev": "pnpx ts-node-dev src/index.ts",
+    "start": "pnpx ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
