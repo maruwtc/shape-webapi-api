@@ -1,9 +1,5 @@
-import crypto from 'crypto'
 import { User, UserInput } from '../models/users.model'
-
-const hashPassword = (password: string, salt: string): string => {
-    return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
-}
+import { hashedPassword } from '../middlewares/hashing'
 
 const getAllUsers = async (ctx: any) => {
     try {
@@ -33,8 +29,6 @@ const getUserById = async (ctx: any) => {
 const createUser = async (ctx: any) => {
     try {
         const { name, role, password }: UserInput = ctx.request.body
-        const salt = crypto.randomBytes(16).toString('hex')
-        const hashedPassword = hashPassword(password, salt)
         const smallestUsableId = await User.find().sort({ id: 1 }).limit(1)
         let newId = smallestUsableId[0].id + 1
         while (true) {
@@ -48,8 +42,7 @@ const createUser = async (ctx: any) => {
             id: newId,
             name,
             role,
-            password: hashedPassword,
-            salt: salt
+            password: hashedPassword(password),
         })
         await user.save()
         ctx.body = user
@@ -64,12 +57,9 @@ const updateUser = async (ctx: any) => {
         const { name, role, password }: UserInput = ctx.request.body
         const user = await User.findOne({ id: ctx.params.id })
         if (user) {
-            const salt = crypto.randomBytes(16).toString('hex')
-            const hashedPassword = hashPassword(password, salt)
             user.name = name
             user.role = role
-            user.password = hashedPassword
-            user.salt = salt
+            user.password = hashedPassword(password)
             await user.save()
             ctx.body = user
             ctx.body.__v ++
