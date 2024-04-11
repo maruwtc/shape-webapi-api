@@ -13,14 +13,15 @@ const getAllUsers = async (ctx: any) => {
 
 const getUserById = async (ctx: any) => {
     try {
-        const user = await User.findOne({ id: ctx.params.id })
+        const user = await User.findOne({ _id: ctx.params.id })
         if (user) {
             ctx.body = user
         } else {
             ctx.status = 404
             ctx.body = { message: 'User not found' }
         }
-    } catch (error: any) {
+    }
+    catch (error: any) {
         ctx.status = 500
         ctx.body = { message: error.message }
     }
@@ -28,7 +29,7 @@ const getUserById = async (ctx: any) => {
 
 const createUser = async (ctx: any) => {
     try {
-        const { name, role, password }: UserInput = ctx.request.body
+        const { name, password }: UserInput = ctx.request.body
         const smallestUsableId = await User.find().sort({ id: 1 }).limit(1)
         let newId = smallestUsableId[0].id + 1
         while (true) {
@@ -41,9 +42,13 @@ const createUser = async (ctx: any) => {
         const user = new User({
             id: newId,
             name,
-            role,
             password: hashedPassword(password),
         })
+        if (await User.findOne({ name })) {
+            ctx.status = 409
+            ctx.body = { message: 'User already exists' }
+            return
+        }
         await user.save()
         ctx.body = user
     } catch (error: any) {
@@ -54,11 +59,10 @@ const createUser = async (ctx: any) => {
 
 const updateUser = async (ctx: any) => {
     try {
-        const { name, role, password }: UserInput = ctx.request.body
+        const { name, password }: UserInput = ctx.request.body
         const user = await User.findOne({ id: ctx.params.id })
         if (user) {
             user.name = name
-            user.role = role
             user.password = hashedPassword(password)
             await user.save()
             ctx.body = user
@@ -75,9 +79,9 @@ const updateUser = async (ctx: any) => {
 
 const deleteUser = async (ctx: any) => {
     try {
-        const user = await User.findOne({ id: ctx.params.id })
+        const user = await User.findOne({ _id: ctx.params.id })
         if (user) {
-            await User.deleteOne({ id: ctx.params.id })
+            await User.deleteOne({ _id: ctx.params.id })
             ctx.body = { message: 'User deleted' }
         } else {
             ctx.status = 404
