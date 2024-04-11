@@ -44,6 +44,13 @@ const createPet = async (ctx: any) => {
     } catch (error: any) {
         ctx.status = 500
         ctx.body = { message: error.message }
+        if (error.message.includes('duplicate key error')) {
+            ctx.status = 400
+            ctx.body = { message: 'Pet already exists' }
+        } else if (error.message.includes('pets validation failed')) {
+            ctx.status = 400
+            ctx.body = { message: 'Missing required fields' }
+        }
     }
 }
 
