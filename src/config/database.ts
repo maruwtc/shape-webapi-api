@@ -1,13 +1,11 @@
 import * as mongoose from 'mongoose'
-import dotenv from 'dotenv'
-
-dotenv.config()
+import { config } from '../../config'
 
 const user = process.env.MONGODB_USER
 const password = process.env.MONGODB_PASSWORD
 const dbName = process.env.MONGODB_DB
 
-const uri = `mongodb+srv://${user}:${password}@${dbName}.4eilgsx.mongodb.net/${dbName}`
+const uri = `mongodb+srv://${config.mongodb_user}:${config.mongodb_password}@${config.mongodb_db}.4eilgsx.mongodb.net/${config.mongodb_db}`
 
 export const connect = async () => {
     try {
