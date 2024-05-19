@@ -36,11 +36,24 @@ export const handleLogin = async (ctx: any) => {
 }
 
 export const handleRegister = async (ctx: any) => {
-    const { email, password } = ctx.request.body
+    const { email, password, role } = ctx.request.body
     try {
-        const authended = await createUserWithEmailAndPassword(auth, email, password)
-        const data = await authended.user
-        ctx.body = { data }
+        if (!email || !password) {
+            ctx.status = 400
+            ctx.body = { message: 'Missing required fields' }
+            return
+        }
+        const authEnded = await createUserWithEmailAndPassword(auth, email, password)
+        const data = await authEnded.user
+        if (!role) {
+            await adminAuth.setCustomUserClaims(data.uid, { role: 'user' })
+        } else {
+            await adminAuth.setCustomUserClaims(data.uid, { role })
+        }
+        const userData = await adminAuth.getUser(data.uid)
+        const assignedRole = userData.customClaims?.role || 'user'
+        ctx.body = { data: userData, role: assignedRole, token: await data.getIdToken()}
+        ctx.status = 201
     } catch (error: any) {
         if (error.message === 'Firebase: Error (auth/email-already-in-use).') {
             ctx.status = 409
@@ -104,19 +117,43 @@ export const isAuthorized = async (ctx: any, next: any) => {
     }
 };
 
+export const isAdmin = async (ctx: any, next: any) => {
+    const token = ctx.request.body.token ? ctx.request.body.token : ctx.request.headers.token;
+    try {
+        const decodedToken = await adminAuth.verifyIdToken(token);
+        const uid = decodedToken.uid;
+        const user = await adminAuth.getUser(uid);
+        if (user.customClaims?.role === 'admin') {
+            ctx.status = 200;
+            ctx.body = { message: 'Authorized' };
+            await next();
+        } else {
+            ctx.status = 403;
+            ctx.body = { message: 'Unauthorized' };
+        }
+    } catch (error: any) {
+        if (error.message === 'First argument to verifyIdToken() must be a Firebase ID token string.') {
+            ctx.status = 401;
+            ctx.body = { message: 'Token invalid' };
+        } else if (error.message === 'Firebase: Error (auth/id-token-expired).') {
+            ctx.status = 401;
+            ctx.body = { message: 'Token expired' };
+        } else {
+            ctx.status = 401;
+            ctx.body = { message: error.message };
+        }
+    }
+}
+
 export const getUser = async (ctx: any) => {
     const token = ctx.request.body.token
     try {
-        await adminAuth.verifyIdToken(token)
-            .then((decodedToken) => {
-                const uid = decodedToken.uid
-                const email = decodedToken.email
-                ctx.body = { uid: uid, email: email }
-            })
-            .catch((error) => {
-                ctx.status = 401
-                ctx.body = { message: error.message }
-            })
+        const decodedToken = await adminAuth.verifyIdToken(token);
+        const uid = decodedToken.uid;
+        const email = decodedToken.email;
+        const role = decodedToken.role;
+        ctx.body = { uid, email, role };
+        ctx.status = 200;
     } catch (error: any) {
         if (error.message === 'Firebase: Error (auth/id-token-expired).') {
             ctx.status = 401
@@ -179,18 +216,6 @@ export const uploadImage = async (ctx: any) => {
         const buffer = Buffer.from(base64Image, 'base64');
         const fileName = `images/${new Date().getTime()}.png`;
         try {
-            // const file = bucket.file(fileName);
-            // await file.save(buffer, {
-            //     metadata: {
-            //         contentType: 'image/png',
-            //         metadata: {
-            //             firebaseStorageDownloadTokens: new Date().getTime()
-            //         }
-            //     },
-            //     public: true
-            // });
-            // const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${new Date().getTime()}`;
-            // ctx.body = { url };
             await isAuthorized(ctx, async () => {
                 const decodedToken = await adminAuth.verifyIdToken(token);
                 const uid = decodedToken.uid;
