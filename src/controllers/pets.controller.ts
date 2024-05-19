@@ -12,7 +12,7 @@ const getAllPets = async (ctx: any) => {
 
 const getPetById = async (ctx: any) => {
     try {
-        const pet = await Pet.findOne({ id: ctx.params.id })
+        const pet = await Pet.findOne({ _id: ctx.params.id })
         if (pet) {
             ctx.body = pet
         } else {
@@ -27,17 +27,15 @@ const getPetById = async (ctx: any) => {
 
 const createPet = async (ctx: any) => {
     try {
-        const { name, category, age, breed, location, image, description }: PetInput = ctx.request.body
-        const smallestusableid = await Pet.find().sort({ id: -1 }).limit(1)
+        const { name, age, breed, location, image }: PetInput = ctx.request.body.pet
+        // const smallestusableid = await Pet.find().sort({ id: -1 }).limit(1)
         const pet = new Pet({
-            id: smallestusableid[0].id + 1,
+            // id: smallestusableid[0].id + 1,
             name,
-            category,
             age,
             breed,
             location,
             image,
-            description
         })
         await pet.save()
         ctx.body = pet
@@ -46,7 +44,7 @@ const createPet = async (ctx: any) => {
         ctx.body = { message: error.message }
         if (error.message.includes('duplicate key error')) {
             ctx.status = 400
-            ctx.body = { message: 'Pet already exists' }
+            ctx.body = { message: error.message }
         } else if (error.message.includes('pets validation failed')) {
             ctx.status = 400
             ctx.body = { message: 'Missing required fields' }
@@ -56,16 +54,14 @@ const createPet = async (ctx: any) => {
 
 const updatePet = async (ctx: any) => {
     try {
-        const { name, category, age, breed, location, image, description }: PetInput = ctx.request.body
-        const pet = await Pet.findOne({ id: ctx.params.id })
+        const { name, age, breed, location, image }: PetInput = ctx.request.body
+        const pet = await Pet.findOne({ _id: ctx.params.id })
         if (pet) {
             pet.name = name
-            pet.category = category
             pet.age = age
             pet.breed = breed
             pet.location = location
             pet.image = image
-            pet.description = description
             await pet.save()
             ctx.body = pet
             ctx.body.__v ++
@@ -81,9 +77,9 @@ const updatePet = async (ctx: any) => {
 
 const deletePet = async (ctx: any) => {
     try {
-        const pet = await Pet.findOne({ id: ctx.params.id })
+        const pet = await Pet.findOne({ _id: ctx.params.id })
         if (pet) {
-            await pet.deleteOne({ id: ctx.params.id })
+            await pet.deleteOne({ _id: ctx.params.id })
             ctx.body = { message: 'Pet deleted' }
         } else {
             ctx.status = 404
