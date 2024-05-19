@@ -1,9 +1,8 @@
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signOut
 } from "firebase/auth"
-import { auth, adminAuth } from "../config/firebase"
+import { auth, adminAuth, bucket } from "../config/firebase"
 
 export const handleLogin = async (ctx: any) => {
     const { email, password } = ctx.request.body
@@ -36,16 +35,6 @@ export const handleLogin = async (ctx: any) => {
     }
 }
 
-export const handleSignout = async (ctx: any) => {
-    try {
-        await signOut(auth)
-        ctx.body = { message: 'Signout successful' }
-    } catch (error: any) {
-        ctx.status = 500
-        ctx.body = { message: error.message }
-    }
-}
-
 export const handleRegister = async (ctx: any) => {
     const { email, password } = ctx.request.body
     try {
@@ -71,10 +60,10 @@ export const handleRegister = async (ctx: any) => {
     }
 }
 
-export const isAuthorized = async (ctx: any) => {
+export const isAuth = async (ctx: any) => {
     const token = ctx.request.body.token
     try {
-        await adminAuth.auth().verifyIdToken(token)
+        await adminAuth.verifyIdToken(token)
             .then((decodedToken) => {
                 const uid = decodedToken.uid
                 ctx.body = { uid }
@@ -94,10 +83,31 @@ export const isAuthorized = async (ctx: any) => {
     }
 }
 
+export const isAuthorized = async (ctx: any, next: any) => {
+    const token = ctx.request.body.token ? ctx.request.body.token : ctx.request.headers.token;
+    try {
+        const decodedToken = await adminAuth.verifyIdToken(token);
+        const uid = decodedToken.uid;
+        ctx.state.uid = uid;
+        await next();
+    } catch (error: any) {
+        if (error.message === 'First argument to verifyIdToken() must be a Firebase ID token string.') {
+            ctx.status = 401;
+            ctx.body = { message: 'Token invalid' };
+        } else if (error.message === 'Firebase: Error (auth/id-token-expired).') {
+            ctx.status = 401;
+            ctx.body = { message: 'Token expired' };
+        } else {
+            ctx.status = 401;
+            ctx.body = { message: error.message };
+        }
+    }
+};
+
 export const getUser = async (ctx: any) => {
     const token = ctx.request.body.token
     try {
-        await adminAuth.auth().verifyIdToken(token)
+        await adminAuth.verifyIdToken(token)
             .then((decodedToken) => {
                 const uid = decodedToken.uid
                 const email = decodedToken.email
@@ -119,5 +129,87 @@ export const getUser = async (ctx: any) => {
         }
         ctx.status = 500
         ctx.body = { message: error.message }
+    }
+}
+
+export const deleteUser = async (ctx: any) => {
+    const token = ctx.request.body.token;
+    if (!token) {
+        ctx.status = 400;
+        ctx.body = { message: 'Token is required' };
+        return;
+    }
+    try {
+        const decodedToken = await adminAuth.verifyIdToken(token);
+        const uid = decodedToken.uid;
+        await adminAuth.deleteUser(uid);
+        ctx.status = 200;
+        ctx.body = { message: 'User deleted' };
+    } catch (error: any) {
+        if (error.code === 'auth/id-token-expired') {
+            ctx.status = 401;
+            ctx.body = { message: 'Token expired' };
+        } else if (error.code === 'auth/argument-error') {
+            ctx.status = 401;
+            ctx.body = { message: 'Invalid token' };
+        } else if (error.code === 'auth/user-not-found') {
+            ctx.status = 404;
+            ctx.body = { message: 'User not found' };
+        } else {
+            ctx.status = 500;
+            ctx.body = { message: error.message };
+        }
+    }
+};
+
+export const uploadImage = async (ctx: any) => {
+    const token = ctx.request.body.token
+    const image = ctx.request.body.image
+    if (!token) {
+        ctx.status = 400
+        ctx.body = { message: 'Token is required' }
+        return
+    }
+    else if (!image) {
+        ctx.status = 400
+        ctx.body = { message: 'Image is required' }
+        return
+    } else {
+        const base64Image = image.replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Image, 'base64');
+        const fileName = `images/${new Date().getTime()}.png`;
+        try {
+            // const file = bucket.file(fileName);
+            // await file.save(buffer, {
+            //     metadata: {
+            //         contentType: 'image/png',
+            //         metadata: {
+            //             firebaseStorageDownloadTokens: new Date().getTime()
+            //         }
+            //     },
+            //     public: true
+            // });
+            // const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${new Date().getTime()}`;
+            // ctx.body = { url };
+            await isAuthorized(ctx, async () => {
+                const decodedToken = await adminAuth.verifyIdToken(token);
+                const uid = decodedToken.uid;
+                const file = bucket.file(fileName);
+                await file.save(buffer, {
+                    metadata: {
+                        contentType: 'image/png',
+                        metadata: {
+                            firebaseStorageDownloadTokens: new Date().getTime()
+                        }
+                    },
+                    public: true
+                });
+                const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${new Date().getTime()}`;
+                ctx.body = { url };
+            });
+        } catch (error: any) {
+            ctx.status = 500;
+            ctx.body = { message: error.message };
+        }
     }
 }
