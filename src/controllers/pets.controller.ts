@@ -28,9 +28,7 @@ const getPetById = async (ctx: any) => {
 const createPet = async (ctx: any) => {
     try {
         const { name, age, breed, location, image }: PetInput = ctx.request.body.pet
-        // const smallestusableid = await Pet.find().sort({ id: -1 }).limit(1)
         const pet = new Pet({
-            // id: smallestusableid[0].id + 1,
             name,
             age,
             breed,
