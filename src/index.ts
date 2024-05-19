@@ -6,6 +6,7 @@ import cors from '@koa/cors'
 import { connect as ConnectDB } from './config/database'
 import { router as firebase } from './routes/v1/auth.route'
 import { router as pets } from './routes/v1/pets.route'
+import { router as users } from './routes/v1/users.route'
 
 const router: Router = new Router()
 
@@ -23,6 +24,7 @@ app.use(bodyParser())
 app.use(router.routes())
 app.use(firebase.routes())
 app.use(pets.routes())
+app.use(users.routes())
 
 app.use(async (ctx: RouterContext, next: any) => {
     try {
