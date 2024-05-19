@@ -54,7 +54,7 @@ const createPet = async (ctx: any) => {
 
 const updatePet = async (ctx: any) => {
     try {
-        const { name, age, breed, location, image }: PetInput = ctx.request.body
+        const { name, age, breed, location, image }: PetInput = ctx.request.body.pet
         const pet = await Pet.findOne({ _id: ctx.params.id })
         if (pet) {
             pet.name = name
