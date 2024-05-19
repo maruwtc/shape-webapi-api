@@ -27,12 +27,14 @@ app.use(pets.routes())
 app.use(async (ctx: RouterContext, next: any) => {
     try {
         await next()
+    } catch (err: any) {
         if (ctx.status === 404) {
             ctx.status = 404
-            ctx.body = 'Page not found'
+            ctx.body = { message: err.message }
+        } else {
+            ctx.status = err.statusCode || err.status || 500
+            ctx.body = { message: err.message }
         }
-    } catch (err: any) {
-        ctx.body = { message: err.message }
     }
 })
 
