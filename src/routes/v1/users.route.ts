@@ -3,7 +3,7 @@ import bodyParser from 'koa-bodyparser'
 import { getUserWishlist, addUserWishlist, removeUserWishlist } from '../../controllers/users.controller'
 import { isAuthorized } from '../../middlewares/firebase'
 
-const router = new Router({ prefix: '/api/v1' })
+const router = new Router()
 
 router.get('/users/:userid/wishlist', isAuthorized, getUserWishlist)
 router.put('/users/:userid/wishlist', isAuthorized, bodyParser(), addUserWishlist)

@@ -77,11 +77,11 @@ export const isAuth = async (ctx: any) => {
     const token = ctx.request.body.token
     try {
         await adminAuth.verifyIdToken(token)
-            .then((decodedToken) => {
+            .then((decodedToken: any) => {
                 const uid = decodedToken.uid
                 ctx.body = { uid }
             })
-            .catch((error) => {
+            .catch((error: any) => {
                 ctx.status = 401
                 ctx.body = { message: error.message }
             })

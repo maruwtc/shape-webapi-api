@@ -3,7 +3,7 @@ import bodyParser from 'koa-bodyparser'
 import { getAllPets, getPetById, createPet, updatePet, deletePet } from '../../controllers/pets.controller'
 import { isAuthorized } from '../../middlewares/firebase'
 
-const router = new Router({ prefix: '/api/v1' })
+const router = new Router()
 
 router.get('/pets', getAllPets)
 router.get('/pets/:id', isAuthorized, getPetById)
