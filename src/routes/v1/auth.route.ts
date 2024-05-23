@@ -2,7 +2,7 @@ import Router from 'koa-router'
 import { handleLogin, handleRegister, isAuth, isAdmin, getUser, deleteUser, uploadImage } from '../../middlewares/firebase'
 import bodyParser from 'koa-bodyparser'
 
-const router = new Router({ prefix: '/api/v1' })
+const router = new Router()
 
 router.post('/signin', bodyParser(), handleLogin)
 router.post('/register', bodyParser(), handleRegister)
