@@ -1,16 +1,43 @@
-const swaggerAutogen = require('swagger-autogen')();
+const swaggerAutogen = require('swagger-autogen')({ openapi: '3.0.0' });
 
 const doc = {
     info: {
-        title: 'API Documentation',
-        description: 'This is the API documentation for the API',
+        version: '1.0.0',
+        title: 'Pet Shelter API',
+        description: 'This is a simple CRUD API application made with Koa and documented with Swagger. All operations are not actually performed.',
     },
-    host: 'localhost:8000',
-    basePath: '/api/v1',
-    schemes: ['http'],
+    servers: [
+        {
+            url: 'http://localhost:8000/api/v1',
+        },
+    ],
+    tags: [
+        {
+            name: 'Pets',
+            description: 'Operations related to pets'
+        },
+        {
+            name: 'Users',
+            description: "Operations related to users. Login and Register operations are not available to try"
+        }
+    ],
+    components: {
+        securitySchemes: {
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+            },
+        },
+    },
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
 };
 
 const outputFile = './src/docs/swagger.json';
-const routes = ['./src/routes/v1/pets.route.ts', './src/routes/v1/users.route.ts', './src/routes/v1/auth.route.ts'];
+const endpointsFiles = ['./src/routes/v1/pets.route.ts', './src/routes/v1/users.route.ts'];
 
-swaggerAutogen(outputFile, routes, doc)
+swaggerAutogen(outputFile, endpointsFiles, doc);
