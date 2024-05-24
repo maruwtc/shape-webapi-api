@@ -14,6 +14,7 @@ type PetInput = {
     breed: PetDocument['breed']
     location: PetDocument['location']
     image: PetDocument['image']
+    __v?: PetDocument['__v']
 }
 
 const PetSchema = new mongoose.Schema({
