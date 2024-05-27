@@ -34,6 +34,7 @@ export const createPet = async (ctx: any) => {
             breed,
             location,
             image,
+            __v: 0
         })
         await pet.save()
         ctx.body = pet
@@ -52,7 +53,7 @@ export const createPet = async (ctx: any) => {
 
 export const updatePet = async (ctx: any) => {
     try {
-        const { name, age, breed, location, image, __v }: PetInput = ctx.request.body.pet
+        const { name, age, breed, location, image }: PetInput = ctx.request.body.pet
         const pet = await Pet.findOne({ _id: ctx.params.id })
         if (pet) {
             pet.name = name
@@ -60,7 +61,7 @@ export const updatePet = async (ctx: any) => {
             pet.breed = breed
             pet.location = location
             pet.image = image
-            pet.__v = __v + 1
+            pet.__v = pet.__v + 1
             await pet.save()
             ctx.body = pet
         } else {
