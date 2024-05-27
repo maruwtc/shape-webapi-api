@@ -231,48 +231,31 @@ export const getUser = async (ctx: any) => {
         ctx.status = 401;
         ctx.body = 'Authorization token is required';
         return;
-    } else if (swaggertoken) {
-        try {
-            const decodedToken = await adminAuth.verifyIdToken(swaggertoken);
-            const uid = decodedToken.uid;
-            const email = decodedToken.email;
-            const role = decodedToken.role;
-            ctx.body = { message: 'Swagger Get User: ', uid, email, role };
-            ctx.status = 200;
-        } catch (error: any) {
-            if (error.message === 'First argument to verifyIdToken() must be a Firebase ID token string.') {
-                ctx.status = 401;
-                ctx.body = { message: 'Token invalid' };
-            } else if (error.message === 'Firebase: Error (auth/id-token-expired).') {
-                ctx.status = 401;
-                ctx.body = { message: 'Token expired' };
-            } else {
-                ctx.status = 500;
-                ctx.body = { message: error.message };
-            }
+    }
+    const actualToken = swaggertoken || token;
+    try {
+        const decodedToken = await adminAuth.verifyIdToken(actualToken);
+        const { uid, email, role } = decodedToken;
+        if (!uid || !email) {
+            ctx.status = 400;
+            ctx.body = { message: 'Invalid token structure' };
+            return;
         }
-    } else {
-        try {
-            const decodedToken = await adminAuth.verifyIdToken(token);
-            const uid = decodedToken.uid;
-            const email = decodedToken.email;
-            const role = decodedToken.role;
-            ctx.body = { uid, email, role };
-            ctx.status = 200;
-        } catch (error: any) {
-            if (error.message === 'First argument to verifyIdToken() must be a Firebase ID token string.') {
-                ctx.status = 401;
-                ctx.body = { message: 'Token invalid' };
-            } else if (error.message === 'Firebase: Error (auth/id-token-expired).') {
-                ctx.status = 401;
-                ctx.body = { message: 'Token expired' };
-            } else {
-                ctx.status = 500;
-                ctx.body = { message: error.message };
-            }
+        ctx.body = { uid, email, role };
+        ctx.status = 200;
+    } catch (error: any) {
+        if (error.message.includes('verifyIdToken() must be a Firebase ID token string')) {
+            ctx.status = 401;
+            ctx.body = { message: 'Token invalid' };
+        } else if (error.message.includes('auth/id-token-expired')) {
+            ctx.status = 401;
+            ctx.body = { message: 'Token expired' };
+        } else {
+            ctx.status = 500;
+            ctx.body = { message: error.message };
         }
     }
-}
+};
 
 export const deleteUser = async (ctx: any) => {
     const token = ctx.request.body.token;
