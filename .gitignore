@@ -1,5 +1,5 @@
 node_modules
 .vscode
 .env
-config.ts
+# config.ts
 serviceAccount.json
